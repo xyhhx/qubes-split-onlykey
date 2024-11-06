@@ -1,0 +1,20 @@
+#!/bin/sh
+# Qubes App Split SSH Script
+set -xeuo pipefail
+
+ssh_identity="xyhhx@sr.ht"
+LOG_FILE="${HOME}/onlykey-agent.log"
+SELF="$(qubesdb-read /name)"
+
+. <(onlykey-agent "${ssh_identity}" -d --log-file="${LOG_FILE}")
+
+# safeguard - Qubes notification bubble for each ssh request
+notify-send "[${SELF}] SSH agent access from: ${QREXEC_REMOTE_DOMAIN} for ${ssh_identity}"
+
+# SSH connection
+socat - "UNIX-CONNECT:${SSH_AUTH_SOCK}"
+
+# Clean up 
+ps aux | grep -v grep| grep onlykey | awk '{ print $2 }' | xargs kill -9
+rm /tmp/trezor-*
+
