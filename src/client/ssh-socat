@@ -1,0 +1,22 @@
+#!/bin/sh
+set -xeuo pipefail
+
+SSH_IDENTITY="${1:-$SSH_IDENTITY}"
+SSH_VAULT_VM="${2:-$SSH_VAULT_VM}"
+
+if [[ -z "${SSH_IDENTITY}" ]]; then
+  echo "\$SSH_IDENTITY not set. Exiting" && exit
+fi
+
+if [[ -z "${SSH_VAULT_VM}" ]]; then
+  echo "\$SSH_VAULT_VM not set. Exiting" && exit
+fi
+
+if [ "${SSH_VAULT_VM}" != "" ]; then
+  export SSH_SOCK="/home/user/.SSH_AGENT_${SSH_VAULT_VM}"
+  rm -f "${SSH_SOCK}"
+  sudo -u user /bin/sh -c \
+	  "umask 177 && exec socat 'UNIX-LISTEN:${SSH_SOCK},fork' 'EXEC:qrexec-client-vm ${SSH_VAULT_VM} qubes.SshAgent+${SSH_IDENTITY}'" &
+fi
+
+echo "SSH_AUTH_SOCK=${SSH_SOCK}"

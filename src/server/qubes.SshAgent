@@ -2,14 +2,16 @@
 # Qubes App Split SSH Script
 set -xeuo pipefail
 
-ssh_identity="xyhhx@sr.ht"
+# Setup
+SSH_IDENTITY="$(echo "${1}" | sed 's/_/@/')"
 LOG_FILE="${HOME}/onlykey-agent.log"
 SELF="$(qubesdb-read /name)"
+SOCK_PATH="/run/user/1000/onlykey-agent-${1}.socket"
 
-. <(onlykey-agent "${ssh_identity}" -d --log-file="${LOG_FILE}")
+. <(onlykey-agent "${SSH_IDENTITY}" -d --log-file="${LOG_FILE}" --sock-path "${SOCK_PATH}")
 
 # safeguard - Qubes notification bubble for each ssh request
-notify-send "[${SELF}] SSH agent access from: ${QREXEC_REMOTE_DOMAIN} for ${ssh_identity}"
+notify-send "[${SELF}] SSH agent access from: ${QREXEC_REMOTE_DOMAIN} for ${SSH_IDENTITY}"
 
 # SSH connection
 socat - "UNIX-CONNECT:${SSH_AUTH_SOCK}"
