@@ -12,7 +12,7 @@ a simple split ssh implementation for your onlykeys
 
 - create a template for your onlykey agent. i like to call mine `provides-onlykey` and this repo assumes it's based on fedora 40 minimal
 - copy `./src/server/install.sh` into it, and run that. this will install all the required dependencies
-- copy `./src/server/qubes.SshAgent` into `/etc/qubes-rpc/qubes.SshAgent`
+- copy `./src/server/onlykey.SshAgent` into `/etc/qubes-rpc/onlykey.SshAgent`
 
 #### create a sys-onlykey appvm
 
