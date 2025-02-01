@@ -8,8 +8,9 @@ SSH_IDENTITY="$(echo "${1}" | sed 's/_/@/')"
 LOG_FILE="${HOME}/onlykey-agent.log"
 SELF="$(qubesdb-read /name)"
 SOCK_PATH="/run/user/1000/onlykey-agent-${SSH_IDENTITY}.socket"
+ONLYKEY_AGENT="/home/user/.local/bin/onlykey-agent"
 
-. <(onlykey-agent "${SSH_IDENTITY}" -d --log-file="${LOG_FILE}" --sock-path "${SOCK_PATH}")
+. <("${ONLYKEY_AGENT}" "${SSH_IDENTITY}" -d --log-file="${LOG_FILE}" --sock-path "${SOCK_PATH}")
 
 # safeguard - Qubes notification bubble for each ssh request
 notify-send "[${SELF}] SSH agent access from: ${QREXEC_REMOTE_DOMAIN} for ${SSH_IDENTITY}"
