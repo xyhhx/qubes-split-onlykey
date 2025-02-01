@@ -1,4 +1,5 @@
 #!/bin/sh
+
 # Qubes App Split SSH Script
 set -xeuo pipefail
 
@@ -6,7 +7,7 @@ set -xeuo pipefail
 SSH_IDENTITY="$(echo "${1}" | sed 's/_/@/')"
 LOG_FILE="${HOME}/onlykey-agent.log"
 SELF="$(qubesdb-read /name)"
-SOCK_PATH="/run/user/1000/onlykey-agent-${1}.socket"
+SOCK_PATH="/run/user/1000/onlykey-agent-${SSH_IDENTITY}.socket"
 
 . <(onlykey-agent "${SSH_IDENTITY}" -d --log-file="${LOG_FILE}" --sock-path "${SOCK_PATH}")
 

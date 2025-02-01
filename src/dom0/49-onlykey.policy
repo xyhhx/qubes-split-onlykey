@@ -1,0 +1,16 @@
+# vi: set ts=2 sw=2 et number
+
+# CTAP Policies
+
+u2f.Register      *  @anyvm  sys-onlykey  allow notify=yes 
+u2f.Authenticate  *  @anyvm  sys-onlykey  allow notify=yes
+u2f.Authenticate  +  @anyvm  sys-onlykey  allow notify=yes
+
+ctap.GetInfo   *  @anyvm  sys-onlykey  allow notify=yes
+ctap.ClientPin *  @anyvm  sys-onlykey  allow notify=yes
+
+policy.RegisterArgument  +u2f.Authenticate  sys-onlykey  @anyvm  allow target=@adminvm
+
+# SSH Agent Policies
+
+onlykey.SshAgent * @anyvm  @anyvm ask
