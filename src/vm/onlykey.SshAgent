@@ -1,14 +1,22 @@
 #!/bin/bash
-set -euo pipefail
+set -eo pipefail
 
 self="$(qubesdb-read /name)"
 log_file="${HOME}/onlykey-agent.log"
-sock_path="${XDG_RUNTIME_DIR:-"/tmp"}/onlykey-agent-${1}.sock"
-ssh_identity="$(sed 's/_/@/' "${1}")"
+runtime_sock_dir="${XDG_RUNTIME_DIR:-"/tmp"}"
+ssh_identity_file="${HOME}/.ssh/onlykey.conf"
 
-if [[ -z "${ssh_identity}" ]]; then
-  notify-send "[${self}] No SSH identity passed. Aborting" >&2
+if [[ -z "${1}" && -z "${ssh_identity_file}" ]]; then
+  notify-send "[${self}] No SSH identity configured. Aborting" >&2
   exit 1
+fi
+
+if [[ -n "${1}" ]]; then
+  sock_path="${runtime_sock_dir}/onlykey-agent-${QREXEC_REMOTE_DOMAIN}-${1}.sock"
+  ssh_identity="$(sed 's/_/@/' "${1}")"
+else
+  sock_path=$(mktemp "${runtime_sock_dir}/onlykey-agent-${QREXEC_REMOTE_DOMAIN}-XXXXXX.sock") 
+  ssh_identity="${ssh_identity_file}"
 fi
 
 # onlykey-agent -d daemonizes the agent, and prints the unix socket path
@@ -16,7 +24,7 @@ fi
 . <(onlykey-agent "${ssh_identity}" -d -vv --log-file "${log_file}" --sock-path "${sock_path}")
 
 # safeguard - Qubes notification bubble for each ssh request
-notify-send "[${self}] SSH agent access from: ${QREXEC_REMOTE_DOMAIN} for ${ssh_identity}"
+notify-send "[${self}] SSH agent access from: ${QREXEC_REMOTE_DOMAIN}"
 
 # SSH connection
 socat - "unix-connect:${SSH_AUTH_SOCK}"

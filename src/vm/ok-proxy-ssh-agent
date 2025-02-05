@@ -1,21 +1,26 @@
-#!/bin/bash
-set -euo pipefail
+#!/bin/bash --
+set -xeo pipefail
 
 validate_qrexec_target() {
-	if [[ ! "${1}" =~ ^[A-Za-z@][:0-9A-Za-z_-]*$ ]]; then
+	if [[ ! "${1}" =~ ^[A-Za-z@][:0-9A-Za-z_-]+$ ]]; then
 		printf 'Qrexec target (%q) is invalid\n' "${1}" >&2
 		exit 1
 	fi
 }
 
-SYS_ONLYKEY_DOMAIN="${SYS_ONLYKEY_DOMAIN:-"@default"}"
-SSH_IDENTITY="${1:-$SSH_IDENTITY}"
+identity="${1:-$SSH_IDENTITY}"
+agent_socket="${SSH_AUTH_SOCK:-${XDG_RUNTIME_DIR:-"/tmp"}/split-ok-ssh_${QUBES_ONLYKEY_DOMAIN}.sock}"
 
-validate_qrexec_target "${SYS_ONLYKEY_DOMAIN}"
+validate_qrexec_target "${QUBES_ONLYKEY_DOMAIN}"
 
-agent_socket="${XDG_RUNTIME_DIR:-"/tmp"}/split-ok-ssh_${SYS_ONLYKEY_DOMAIN}.sock"
+if [[ -n "${identity}" ]]; then
+	ssh_identity_qrexec_arg="+${identity}"
+else
+	ssh_identity_qrexec_arg=""
+fi
 
 umask 177 && exec socat \
 	"unix-listen:'${agent_socket}',fork,unlink-early" \
-	"exec:qrexec-client-vm ${SYS_ONLYKEY_DOMAIN} onlykey.SshAgent+${SSH_IDENTITY}" 
+	"exec:qrexec-client-vm ${QUBES_ONLYKEY_DOMAIN} onlykey.SshAgent${ssh_identity_qrexec_arg}" &
 
+echo "SSH_AUTH_SOCK=${agent_socket}"
