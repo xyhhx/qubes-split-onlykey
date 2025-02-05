@@ -1,0 +1,26 @@
+Name:  	  split-onlykey-dom0
+Version:  @VERSION@ 
+Release:  1%{?dist}
+Summary:  split-onlykey Qubes RPC policies for Dom0
+
+Group:  	  Qubes
+License:    HL3-FULL 
+BuildArch:  noarch
+
+BuildRequires: make
+
+Source0: %{name}-%{version}.tar.gz
+
+%description
+split-onlykey Qubes RPC policies for Dom0
+
+%prep
+%setup -q -n %{name}-%{version}
+
+%install
+make install-dom0 DESTDIR=${RPM_BUILD_ROOT}
+
+%files
+%attr(0664,root,qubes) %config(noreplace) /etc/qubes/policy.d/49-onlykey.policy 
+
+%changelog

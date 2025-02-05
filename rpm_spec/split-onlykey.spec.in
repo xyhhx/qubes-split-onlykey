@@ -1,0 +1,50 @@
+Name:     split-onlykey
+Version:  @VERSION@ 
+Release:  1%{?dist}
+Summary:  Proxy CTAP and SSH to a dedicated Onlykey Qube
+
+
+Group:      Qubes
+License:    HL3-FULL
+BuildArch:  noarch
+
+BuildRequires: make
+BuildRequires: python%{python3_pkgversion}-devel
+BuildRequires: rpmautospec
+
+
+Requires: %{pypi_source onlykey-agent}
+Requires: %{pypi_source onlykey}
+Requires: bash
+Requires: dbus-x11
+Requires: gnupg2
+Requires: libusb1-devel
+Requires: pipx
+Requires: python%{python3_pkgversion}
+Requires: qubes-ctap
+Requires: qubes-usb-proxy
+Requires: socat
+Requires: usbutils
+
+Recommends: desktop-notification-daemon
+Recommends: libnotify
+
+Source0: %{name}-%{version}.tar.gz
+
+%description
+Proxy CTAP and SSH to a dedicated Onlykey Qube. 
+
+%prep
+%setup -q
+
+%install
+make install-vm DESTDIR=${RPM_BUILD_ROOT}
+
+%files
+#%%doc
+/etc/qubes-rpc/onlykey.SshAgent
+/usr/lib/qubes/ok-proxy-ssh-agent
+/usr/lib/udev/rules.d/49-onlykey.rules
+/usr/share/doc/split-onlykey/README.md
+
+%changelog
