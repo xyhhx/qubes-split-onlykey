@@ -53,7 +53,7 @@ make install-vm DESTDIR=${RPM_BUILD_ROOT}
 %doc
 
 %{_udevrulesdir}/49-onlykey.rules
-%{_libdir}/qubes/ok-proxy-ssh-agent
+%{_libdir}/qubes/ok-ssh-proxy
 
 %{_sysconfdir}/qubes-rpc/onlykey.SshAgent
 

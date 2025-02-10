@@ -14,5 +14,5 @@ TODO
 - Pass your Onlykey from your USB qube to `sys-onlykey`
 - In your development (client) qube, start the proxy:
   ```sh
-  ok-proxy-ssh "${ssh_identity}" # ssh_identity should match an ssh identity on your onlykey
+  ok-ssh-proxy "${ssh_identity}" # ssh_identity should match an ssh identity on your onlykey
   ```

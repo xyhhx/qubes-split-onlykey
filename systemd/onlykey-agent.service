@@ -1,6 +1,8 @@
 # vim: set syn=systemd
 [Unit]
 Description=onlykey-agent
+ConditionUser=!root
+ConditionGroup=qubes
 Requires=onlykey-agent.socket
 
 [Service]

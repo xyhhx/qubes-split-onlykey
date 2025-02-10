@@ -26,7 +26,7 @@ install-vm:
 	# 	post-install.d/*.sh \
 	# 	$(DESTDIR)$(POSTINSTALL_DIR) 
 	install -m 0755 \
-		src/vm/ok-proxy-ssh-agent \
+		src/vm/ok-ssh-proxy \
 		$(DESTDIR)$(QUBES_BIN_DIR)/
 
 .PHONY: install-dom0

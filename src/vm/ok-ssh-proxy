@@ -9,9 +9,13 @@ validate_qrexec_target() {
 }
 
 identity="${1:-$SSH_IDENTITY}"
-agent_socket="${SSH_AUTH_SOCK:-${XDG_RUNTIME_DIR:-"/tmp"}/split-ok-ssh_${QUBES_ONLYKEY_DOMAIN}.sock}"
-
 validate_qrexec_target "${QUBES_ONLYKEY_DOMAIN}"
+
+if [[ -n "${SSH_AUTH_SOCK}" ]]; then
+	agent_socket="${SSH_AUTH_SOCK}"
+else
+	agent_socket="${XDG_RUNTIME_DIR:-"/tmp"}/split-ok-ssh_${QUBES_ONLYKEY_DOMAIN}.sock"
+fi
 
 if [[ -n "${identity}" ]]; then
 	ssh_identity_qrexec_arg="+${identity}"

@@ -1,13 +1,22 @@
 #!/bin/bash
-set -eo pipefail
+set -xeo pipefail
 
 self="$(qubesdb-read /name)"
-log_file="${HOME}/onlykey-agent.log"
+
+log_dir="${XDG_STATE_HOME:-"${HOME}/.local/state/log"}/onlykey"
 runtime_sock_dir="${XDG_RUNTIME_DIR:-"/run/user/$(id -u)"}/onlykey"
 config_dir="${XDG_CONFIG_DIR:-"${HOME}/.config"}/onlykey"
 
-mkdir -p "${config_dir}"
+log_file="${log_dir}/onlykey-agent.log"
 ssh_identity_file="${config_dir}/ssh-agent.conf"
+
+for dir in "${log_dir} ${runtime_sock_dir} ${config_dir}"; do
+  mkdir -p $dir;
+done
+
+for file in "${log_file} ${ssh_identity_file}"; do
+  [[ -z "${file}" ]] && touch "${file}";
+done
 
 if [[ -z "${1}" && -z "${ssh_identity_file}" ]]; then
   notify-send "[${self}] No SSH identity configured. Aborting" >&2
@@ -19,7 +28,7 @@ if [[ -n "${1}" ]]; then
   ssh_identity="$(sed 's/_/@/' "${1}")"
 else
   sock_path="${runtime_sock_dir}/qrexec-client_ssh-agent_${QREXEC_REMOTE_DOMAIN}.sock"
-  [[ -z "${ssh_identity_file}" ]] && touch "${ssh_identity_file}"
+  [[ -z "${sock_path}" ]] && touch "${sock_path}"
   ssh_identity="${ssh_identity_file}"
 fi
 
