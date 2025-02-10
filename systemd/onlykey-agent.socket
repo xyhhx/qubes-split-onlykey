@@ -1,0 +1,12 @@
+# vim: set syn=systemd
+[Unit]
+Description=onlykey-agent socket
+
+[Socket]
+ListenStream=%t/onlykey/S.ssh-agent
+FileDescriptorName=std
+SocketMode=0600
+DirectoryMode=0700
+
+[Install]
+WantedBy=sockets.target

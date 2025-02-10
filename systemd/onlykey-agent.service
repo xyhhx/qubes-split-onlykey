@@ -1,0 +1,8 @@
+# vim: set syn=systemd
+[Unit]
+Description=onlykey-agent
+Requires=onlykey-agent.socket
+
+[Service]
+Type=simple
+ExecStart=onlykey-agent %E/onlykey/ssh-agent.conf -f -vv --log-file %L/%N.log --sock-path %t/onlykey/S.ssh-agent

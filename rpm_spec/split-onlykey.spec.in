@@ -11,7 +11,7 @@ BuildArch:  noarch
 BuildRequires: make
 BuildRequires: python%{python3_pkgversion}-devel
 BuildRequires: rpmautospec
-
+BuildRequires: systemd
 
 Requires: %{pypi_source onlykey-agent}
 Requires: %{pypi_source onlykey}
@@ -37,14 +37,30 @@ Proxy CTAP and SSH to a dedicated Onlykey Qube.
 %prep
 %setup -q
 
+%post
+%systemd_post onlykey-agent.service
+
+%preun
+%systemd_preun onlykey-agent.service
+
+%postun
+%systemd_postun_with_restart onlykey-agent.service
+
 %install
 make install-vm DESTDIR=${RPM_BUILD_ROOT}
 
 %files
-#%%doc
-/etc/qubes-rpc/onlykey.SshAgent
-/usr/lib/qubes/ok-proxy-ssh-agent
-/usr/lib/udev/rules.d/49-onlykey.rules
-/usr/share/doc/split-onlykey/README.md
+%doc
 
-%changelog
+%{_udevrulesdir}/49-onlykey.rules
+%{_libdir}/qubes/ok-proxy-ssh-agent
+
+%{_sysconfdir}/qubes-rpc/onlykey.SshAgent
+
+%{_presetdir}/49-onlykey-agent.preset
+%{_unitdir}/onlykey-agent.socket
+%{_unitdir}/onlykey-agent.service
+
+%{_docdir}/split-onlykey/README.md
+
+%autochangelog
