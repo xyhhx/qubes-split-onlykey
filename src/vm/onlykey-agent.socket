@@ -1,0 +1,18 @@
+# vim: set syn=systemd
+[Unit]
+Description=onlykey-agent socket
+ConditionPathExists=|/var/run/qubes-service/onlykey-agent.socket
+ConditionUser=!root
+ConditionGroup=qubes
+
+[Socket]
+ListenStream=%t/onlykey/S.ssh-agent
+Service=onlykey-agent.service
+FileDescriptorName=std
+SocketMode=0600
+DirectoryMode=0700
+
+[Install]
+WantedBy=sockets.target
+
+
