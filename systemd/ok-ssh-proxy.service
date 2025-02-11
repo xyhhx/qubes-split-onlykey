@@ -1,0 +1,20 @@
+# vim: set syn=systemd
+[Unit]
+Description=ok-ssh-proxy
+ConditionUser=!root
+ConditionGroup=qubes
+Requires=ok-ssh-proxy.socket
+ConditionPathExists=|/var/run/qubes-service/ok-ssh-proxy
+
+[Service]
+Type=forking
+ExecStartPre=/bin/bash -c 'cat /rw/config/ok-ssh-proxy.rc | envsubst > %t/qubes-ok-proxy/ok-ssh-proxy.env'
+EnvironmentFile=-%t/qubes-ok-proxy/ok-ssh-proxy.env
+EnvironmentFile=-/rw/config/ok-ssh-proxy.env
+ExecStart=/usr/bin/ok-ssh-proxy
+PassEnvironment=SSH_AUTH_SOCK
+PassEnvironment=QUBES_ONLYKEY_DOMAIN
+PassEnvironment=OK_SSH_SOCK
+
+[Install]
+WantedBy=default.target

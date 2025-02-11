@@ -1,13 +1,13 @@
 # vim: set syn=systemd
 [Unit]
-Description=onlykey-agent socket
-ConditionPathExists=|/var/run/qubes-service/onlykey-agent.socket
+Description=ok-ssh-proxy socket
+ConditionPathExists=|/var/run/qubes-service/ok-ssh-proxy
 ConditionUser=!root
 ConditionGroup=qubes
 
 [Socket]
-ListenStream=%t/onlykey/S.ssh-agent
-Service=onlykey-agent.service
+ListenStream=%t/qubes-ok-proxy/S.ssh-agent
+Service=ok-ssh-proxy.service
 FileDescriptorName=std
 SocketMode=0600
 DirectoryMode=0700

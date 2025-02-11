@@ -1,22 +1,21 @@
 #!/bin/bash
-set -xeo pipefail
+set -eo pipefail
+
+verbose=""
+
+if [[ -n "${OK_DEBUG}" ]]; then
+  set -x;
+  verbose="-vv"
+fi
 
 self="$(qubesdb-read /name)"
 
 log_dir="${XDG_STATE_HOME:-"${HOME}/.local/state/log"}/onlykey"
-runtime_sock_dir="${XDG_RUNTIME_DIR:-"/run/user/$(id -u)"}/onlykey"
+runtime_sock_dir="${XDG_RUNTIME_DIR:-"/run/user/$(id -u)"}/onlykey/qrexec-clients/${QREXEC_REMOTE_DOMAIN}"
 config_dir="${XDG_CONFIG_DIR:-"${HOME}/.config"}/onlykey"
 
 log_file="${log_dir}/onlykey-agent.log"
 ssh_identity_file="${config_dir}/ssh-agent.conf"
-
-for dir in "${log_dir} ${runtime_sock_dir} ${config_dir}"; do
-  mkdir -p $dir;
-done
-
-for file in "${log_file} ${ssh_identity_file}"; do
-  [[ -z "${file}" ]] && touch "${file}";
-done
 
 if [[ -z "${1}" && -z "${ssh_identity_file}" ]]; then
   notify-send "[${self}] No SSH identity configured. Aborting" >&2
@@ -24,17 +23,24 @@ if [[ -z "${1}" && -z "${ssh_identity_file}" ]]; then
 fi
 
 if [[ -n "${1}" ]]; then
-  sock_path="${runtime_sock_dir}/qrexec-client_ssh-agent_${QREXEC_REMOTE_DOMAIN}-${1}.sock"
-  ssh_identity="$(sed 's/_/@/' "${1}")"
+  sock_path="${runtime_sock_dir}/${1}.ssh-agent"
+  # ssh_identity="$(sed 's/_/@/' "${1}")"
+  ssh_identity="${1}"
 else
-  sock_path="${runtime_sock_dir}/qrexec-client_ssh-agent_${QREXEC_REMOTE_DOMAIN}.sock"
-  [[ -z "${sock_path}" ]] && touch "${sock_path}"
+  sock_path="${runtime_sock_dir}/S.ssh-agent"
   ssh_identity="${ssh_identity_file}"
+  touch "${ssh_identity_file}"
 fi
+
+mkdir -p "${log_dir}" "${runtime_sock_dir}" "${config_dir}" 
+touch "${log_file}"  "${sock_path}"
 
 # onlykey-agent -d daemonizes the agent, and prints the unix socket path
 # we can consume this output to update our environment and point to the appropriate agent socket
-. <(onlykey-agent "${ssh_identity}" -d -vv --log-file "${log_file}" --sock-path "${sock_path}")
+. <(onlykey-agent "${ssh_identity}" "${verbose}" -d --log-file "${log_file}" --sock-path "${sock_path}")
+
+# this is wait to make sure the onlykey-agent daemon has started
+# sleep 10
 
 # safeguard - Qubes notification bubble for each ssh request
 notify-send "[${self}] SSH agent access from: ${QREXEC_REMOTE_DOMAIN}"
