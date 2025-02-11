@@ -7,10 +7,11 @@ ConditionGroup=qubes
 
 [Socket]
 ListenStream=%t/qubes-ok-proxy/S.ssh-agent
-Service=ok-ssh-proxy.service
-FileDescriptorName=std
+; Service=ok-ssh-proxy.service
+; FileDescriptorName=std
 SocketMode=0600
 DirectoryMode=0700
+Accept=false
 
 [Install]
 WantedBy=sockets.target

@@ -3,18 +3,62 @@
 Description=ok-ssh-proxy
 ConditionUser=!root
 ConditionGroup=qubes
-Requires=ok-ssh-proxy.socket
 ConditionPathExists=|/var/run/qubes-service/ok-ssh-proxy
+PartOf=ok-ssh-proxy.socket
 
 [Service]
-Type=forking
-ExecStartPre=/bin/bash -c 'cat /rw/config/ok-ssh-proxy.rc | envsubst > %t/qubes-ok-proxy/ok-ssh-proxy.env'
+; Type=notify
+Type=exec
+Environment=OK_DEBUG=true
+ExecStartPre=-/usr/bin/bash -c 'cat /rw/config/ok-ssh-proxy.rc | envsubst > %t/qubes-ok-proxy/ok-ssh-proxy.env'
 EnvironmentFile=-%t/qubes-ok-proxy/ok-ssh-proxy.env
 EnvironmentFile=-/rw/config/ok-ssh-proxy.env
-ExecStart=/usr/bin/ok-ssh-proxy
+Environment="SSH_AUTH_SOCK=$OK_SSH_SOCK"
+ExecStart=-/usr/bin/ok-ssh-proxy
+ExecStartPost=-/usr/bin/sleep 5
 PassEnvironment=SSH_AUTH_SOCK
 PassEnvironment=QUBES_ONLYKEY_DOMAIN
 PassEnvironment=OK_SSH_SOCK
+StandardInput=socket
+; StandardOutput=socket
 
-[Install]
-WantedBy=default.target
+AmbientCapabilities=
+CapabilityBoundingSet=CAP_NET_ADMIN ~CAP_SYS_ADMIN
+;  DynamicUser=yes
+IPAddressDeny=any
+KeyringMode=private
+LockPersonality=true
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateMounts=true
+; PrivateNetwork=true
+; NetworkNamespacePath=/run/tmp/$INVOCATION_ID/
+PrivateTmp=true
+PrivateUsers=true
+ProcSubset=pid
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=read-only
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=net user
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RootDirectory=%t
+SystemCallArchitectures=native
+SystemCallFilter=~@privileged @default @basic-io @file-system @signal @system-service
+SystemCallErrorNumber=EPERM
+TemporaryFileSystem=/var
+UMask=177
+ReadOnlyPaths=/rw/config
+ReadWritePaths=/var /run /tmp
+CacheDirectory=ok-ssh-agent
+LogsDirectory=ok-ssh-agent
+RuntimeDirectory=ok-ssh-agent
+ExecPaths=/usr/bin/ok-ssh-proxy /usr/bin/bash /usr/bin/cat /usr/bin/envsubst /usr/bin/chown /usr/bin/locale /usr/bin/qrexec-client-vm /usr/bin/ssh 

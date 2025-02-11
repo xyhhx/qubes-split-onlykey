@@ -1,7 +1,6 @@
 #!/bin/bash --
-set -eo pipefail
-
-[[ -n "${OK_DEBUG}" ]] && set -x
+set -aeo pipefail
+set -x
 
 validate_qrexec_target() {
   if [[ ! "${1}" =~ ^[A-Za-z@][:0-9A-Za-z_-]+$ ]]; then
@@ -12,18 +11,14 @@ validate_qrexec_target() {
 
 identity="${1:-$SSH_IDENTITY}"
 
-[[ -n "${OK_SSH_SOCK}" ]] \
-	&& agent_socket="${OK_SSH_SOCK}" \
-	|| agent_socket="${XDG_RUNTIME_DIR}/qubes-ok-proxy/S.ssh-agent"
-
 [[ -n "${identity}" ]] \
   && ssh_identity_qrexec_arg="+${identity}" \
   || ssh_identity_qrexec_arg=""
 
-# mkdir -p "$(dirname "${agent_socket}")"
-
 validate_qrexec_target "${QUBES_ONLYKEY_DOMAIN}"
 
-umask 177 && exec socat \
-  "unix-listen:'${agent_socket}',fork,unlink-early" \
-  "exec:qrexec-client-vm ${QUBES_ONLYKEY_DOMAIN} onlykey.SshAgent${ssh_identity_qrexec_arg}" 
+# qrexec-client-vm "${QUBES_ONLYKEY_DOMAIN}" "onlykey.SshAgent${ssh_identity_qrexec_arg}" &
+
+umask 177 && exec socat  \
+  "unix-listen:'${OK_SSH_SOCK}',fork,unlink-early" \
+  "exec:qrexec-client-vm ${QUBES_ONLYKEY_DOMAIN} onlykey.SshAgent${ssh_identity_qrexec_arg}"  

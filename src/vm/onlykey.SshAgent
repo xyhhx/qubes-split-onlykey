@@ -1,11 +1,10 @@
 #!/bin/bash
-set -eo pipefail
+set -aeo pipefail
 
-verbose=""
-
-if [[ -n "${OK_DEBUG}" ]]; then
-  set -x;
-  verbose="-vv"
+if [[ -n "${DEBUG}" ]]; then
+  set -x
+  ok_debug="-vv"
+  socat_debug="-d -d -d"
 fi
 
 self="$(qubesdb-read /name)"
@@ -17,10 +16,6 @@ config_dir="${XDG_CONFIG_DIR:-"${HOME}/.config"}/onlykey"
 log_file="${log_dir}/onlykey-agent.log"
 ssh_identity_file="${config_dir}/ssh-agent.conf"
 
-if [[ -z "${1}" && -z "${ssh_identity_file}" ]]; then
-  notify-send "[${self}] No SSH identity configured. Aborting" >&2
-  exit 1
-fi
 
 if [[ -n "${1}" ]]; then
   sock_path="${runtime_sock_dir}/${1}.ssh-agent"
@@ -37,13 +32,13 @@ touch "${log_file}"  "${sock_path}"
 
 # onlykey-agent -d daemonizes the agent, and prints the unix socket path
 # we can consume this output to update our environment and point to the appropriate agent socket
-. <(onlykey-agent "${ssh_identity}" "${verbose}" -d --log-file "${log_file}" --sock-path "${sock_path}")
+. <(onlykey-agent "${ssh_identity}" -d "${ok_debug:-""}" --log-file "${log_file}" --sock-path "${sock_path}")
 
 # this is wait to make sure the onlykey-agent daemon has started
-# sleep 10
+# sleep 1
 
 # safeguard - Qubes notification bubble for each ssh request
 notify-send "[${self}] SSH agent access from: ${QREXEC_REMOTE_DOMAIN}"
 
 # SSH connection
-socat - "unix-connect:${SSH_AUTH_SOCK}"
+socat ${socat_debug:-""} - "unix-connect:${SSH_AUTH_SOCK}"
