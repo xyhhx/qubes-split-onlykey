@@ -11,14 +11,14 @@ validate_qrexec_target() {
 
 identity="${1:-$SSH_IDENTITY}"
 
-[[ -n "${identity}" ]] \
-  && ssh_identity_qrexec_arg="+${identity}" \
+[[ -n "${identity}" ]] 
+  && ssh_identity_qrexec_arg="+${identity}" 
   || ssh_identity_qrexec_arg=""
 
 validate_qrexec_target "${QUBES_ONLYKEY_DOMAIN}"
 
 # qrexec-client-vm "${QUBES_ONLYKEY_DOMAIN}" "onlykey.SshAgent${ssh_identity_qrexec_arg}" &
 
-umask 177 && exec socat  \
-  "unix-listen:'${OK_SSH_SOCK}',fork,unlink-early" \
+umask 177 && exec socat  
+  "unix-listen:'${OK_SSH_SOCK}',fork,unlink-early" 
   "exec:qrexec-client-vm ${QUBES_ONLYKEY_DOMAIN} onlykey.SshAgent${ssh_identity_qrexec_arg}"  

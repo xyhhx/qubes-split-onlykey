@@ -1,0 +1,8 @@
+#!/bin/bash
+set -aeo pipefail
+
+[[ -n "${LISTEN_FDS}" ]] \
+  && input="fd:0" \
+  || input="${1}"
+
+socat "${input}" "unix-connect:${SSH_AUTH_SOCK}"

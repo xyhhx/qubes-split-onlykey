@@ -1,0 +1,14 @@
+# vim: set syn=systemd :
+[Unit]
+Description=Onlykey SSH Agent daemon connection for %i
+ConditionUser=!root
+ConditionGroup=qubes
+BindsTo=onlykey-agent.service
+BindsTo=onlykey-agent-daemon@%i.service
+Requires=onlykey-agent.socket
+
+[Socket]
+ListenStream=%t/%p/qrexec-clients/%i.sock
+Environment=SSH_AUTH_SOCK=%t/%p/qrexec-clients/%i.sock
+FileDescriptorName=%i
+PassFileDescriptorsToExec=true

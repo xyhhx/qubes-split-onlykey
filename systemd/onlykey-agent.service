@@ -1,0 +1,11 @@
+# vim: set syn=systemd :
+[Unit]
+Description=onlykey-agent
+ConditionUser=!root
+ConditionGroup=qubes
+Requires=onlykey-agent.socket
+
+[Service]
+ExecStart=systemd-socket-activate -a sh -c 'cat <&3'
+; ExecStart=-+/usr/bin/bash -ec 'env >&3'
+; ExecStartPost=-socat fd:3 unix-connect:%t/%p/S.ssh-agent

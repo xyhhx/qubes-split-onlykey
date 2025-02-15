@@ -1,0 +1,5 @@
+#!/bin/bash --
+set -aeo pipefail
+
+read service remote_vm <&0;
+
