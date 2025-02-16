@@ -14,12 +14,12 @@ trap handle_sig SIGHINT
   && exit 1
 
 
-notify-send --ready --status "Root socket ready"
+systemd-notify --ready --status "Root socket ready"
   
 # TODO: configure a default
 
 
 systemctl --user start onlykey-agent-daemon@$(systemd-escape "${QREXEC_REMOTE_DOMAIN}").socket
-notify-send --status "Started a daemon for ${QREXEC_REMOTE_DOMAIN}"
+systemd-notify --status "Started a daemon for ${QREXEC_REMOTE_DOMAIN}"
 
 exit 0

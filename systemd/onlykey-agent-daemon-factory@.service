@@ -1,7 +1,8 @@
 # vim: set syn=systemd :
 [Unit]
-Description=Onlykey SSH Agent daemon factory 
+Description=Onlykey SSH Agent daemon factory %i  
 
 [Service]
+Environment=QREXEC_REMOTE_DOMAIN=%i
 ExecStart=onlykey-agent-daemon-factory
 User=Root

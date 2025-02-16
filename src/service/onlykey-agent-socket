@@ -15,12 +15,10 @@ trap handle_sig SIGHINT
 
 
 notify-send --ready --status "Root socket ready"
-  
-# TODO: configure a default
 
 
 systemctl --user start onlykey-agent-daemon-factory@$(systemd-escape "${QREXEC_REMOTE_DOMAIN}").socket
-notify-send --status "Started a daemon for ${QREXEC_REMOTE_DOMAIN}"
 
-
+# TODO: wtf do i do here?
 socat fd:
+
