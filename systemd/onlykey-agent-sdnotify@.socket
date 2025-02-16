@@ -1,0 +1,14 @@
+# vim: set syn=systemd :
+[Unit]
+Description=Systemd notification socket for %i's Onlykey agent
+
+BindsTo=onlykey-agent.service
+Requires=onlykey-agent.socket
+BindsTo=onlykey-agent-daemon@%i.service
+After=onlykey-agent-daemon@%i.service
+
+[Socket]
+ListenDatagram=%t/%p/%i.sock
+FileDescriptorName=%i
+PassFileDescriptorsToExec=true
+RemoveOnStop=true

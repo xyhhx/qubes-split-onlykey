@@ -5,10 +5,11 @@ ConditionUser=!root
 ConditionGroup=qubes
 BindsTo=onlykey-agent.service
 BindsTo=onlykey-agent-daemon@%i.service
-Requires=onlykey-agent.socket
 
 [Socket]
 ListenStream=%t/%p/qrexec-clients/%i.sock
+Environment=REMOTE_DOMAIN=%i
 Environment=SSH_AUTH_SOCK=%t/%p/qrexec-clients/%i.sock
 FileDescriptorName=%i
 PassFileDescriptorsToExec=true
+RemoveOnStop=true

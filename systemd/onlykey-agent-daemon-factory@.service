@@ -1,0 +1,7 @@
+# vim: set syn=systemd :
+[Unit]
+Description=Onlykey SSH Agent daemon factory 
+
+[Service]
+ExecStart=onlykey-agent-daemon-factory
+User=Root

@@ -1,5 +1,25 @@
-#!/bin/bash --
+#!/bin/bash
 set -aeo pipefail
 
-read service remote_vm <&0;
+handle_sig(){
+  systemd-notify --status "Exiting" \
+    && sleep 3 \
+    && exit 0  
+}
 
+trap handle_sig SIGHINT
+
+[[ -z "${QREXEC_REMOTE_DOMAIN}" && -z "${LISTEN_FDS}" ]] \
+  && echo "No remote to work with" \
+  && exit 1
+
+
+notify-send --ready --status "Root socket ready"
+  
+# TODO: configure a default
+
+
+systemctl --user start onlykey-agent-daemon@$(systemd-escape "${QREXEC_REMOTE_DOMAIN}").socket
+notify-send --status "Started a daemon for ${QREXEC_REMOTE_DOMAIN}"
+
+exit 0

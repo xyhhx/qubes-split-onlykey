@@ -1,11 +1,14 @@
 # vim: set syn=systemd :
 [Unit]
-Description=onlykey-agent socket
+Description=onlykey-agent daemon factory
+
+BindsTo=onlykey-agent.service
 
 [Socket]
-ListenStream=%t/%p/S.ssh-agent
+ListenStream=%t/%p/%i.sock
 PassFileDescriptorsToExec=true
 RemoveOnStop=true
+Accept=true
 
 [Install]
 WantedBy=sockets.target

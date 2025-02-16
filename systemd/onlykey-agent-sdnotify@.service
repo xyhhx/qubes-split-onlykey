@@ -1,0 +1,12 @@
+# vim: set syn=systemd :
+[Unit]
+Description=Onlykey SSH Agent systemd notify service %i
+
+Requires=onlykey-agent.socket
+After=onlykey-agent.socket
+Requires=onlykey-agent-daemon@%i.socket
+BindsTo=onlykey-agent.service
+
+[Service]
+Type=notify
+ExecStart=socat unix-recv:%t/%p/%i.sock fd:3 

@@ -1,11 +1,17 @@
 # vim: set syn=systemd :
 [Unit]
 Description=onlykey-agent
-ConditionUser=!root
-ConditionGroup=qubes
+
 Requires=onlykey-agent.socket
+Requires=onlykey-agent-daemon-factory.socket
+StopWhenUnneeded=true
 
 [Service]
-ExecStart=systemd-socket-activate -a sh -c 'cat <&3'
-; ExecStart=-+/usr/bin/bash -ec 'env >&3'
-; ExecStartPost=-socat fd:3 unix-connect:%t/%p/S.ssh-agent
+Type=notify
+Environment=OK_SSH_SOCK=%t/%p/S.ssh-agent
+ExecStart=systemd-socket-activate -a -l %t/%/%i.aux -E OK_SSH_SOCK /usr/local/bin/onlykey-agent-socket 
+ExecStartPost=-socat fd:3 unix-connect:%t/%p/%i.aux
+ExecStartPost=!ln -s /usr/local/bin/onlykey-agent-socket /usr/local/etc/qubes-rpc/onlykey.SshAgent
+RuntimeDirectory=split-onlykey/ssh-agent
+
+# TODO: Sandboxing/hardening
