@@ -7,7 +7,7 @@ handle_sig(){
     && exit 0  
 }
 
-trap handle_sig SIGHINT
+trap handle_sig 1 2 3 7 
 
 [[ -z "${QREXEC_REMOTE_DOMAIN}" && -z "${LISTEN_FDS}" ]] \
   && echo "No remote to work with" \
