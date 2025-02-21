@@ -1,0 +1,28 @@
+#!/bin/bash
+set -aeo pipefail
+set -x
+
+self="$(qubesdb-read /name)"
+
+log_dir="${XDG_STATE_HOME:-"${HOME}/.local/state/log"}/onlykey-agent"
+runtime_sock_dir="${XDG_RUNTIME_DIR:-"/run/user/$(id -u)"}/onlykey-agent/qrexec-clients/${QREXEC_REMOTE_DOMAIN}"
+config_dir="${XDG_CONFIG_DIR:-"${HOME}/.config"}/onlykey-agent"
+
+mkdir -p "${log_dir}" "${runtime_sock_dir}" "${config_dir}"
+
+log_file_path="${log_dir}/onlykey-agent.log"
+identity_conf_path="${config_dir}/ssh-agent.conf"
+sock_path="${runtime_sock_dir}/S.ssh-agent"
+
+touch "${log_file_path}" "${sock_path}" "${identity_conf_path}"
+
+# onlykey-agent -d daemonizes the agent, and prints the unix socket path
+# we can consume this output to update our environment and point to the appropriate agent socket
+. <(onlykey-agent "${identity_conf_path}" -d -vv --log-file "${log_file_path}" --sock-path "${sock_path}")
+
+# safeguard - Qubes notification bubble for each ssh request
+notify-send "[${self}] SSH agent access from: ${QREXEC_REMOTE_DOMAIN}"
+
+# SSH connection
+socat  - "unix-connect:${SSH_AUTH_SOCK}"
+

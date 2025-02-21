@@ -7,9 +7,9 @@ BindsTo=onlykey-agent.service
 BindsTo=onlykey-agent-daemon@%i.service
 
 [Socket]
-ListenStream=%t/%p/qrexec-clients/%i.sock
+ListenStream=%t/%p/qrexec-clients/%i/S.ssh-agent
 Environment=REMOTE_DOMAIN=%i
-Environment=SSH_AUTH_SOCK=%t/%p/qrexec-clients/%i.sock
+Environment=SSH_AUTH_SOCK=%t/%p/qrexec-clients/%i/S.ssh-agent
 FileDescriptorName=%i
 PassFileDescriptorsToExec=true
 RemoveOnStop=true

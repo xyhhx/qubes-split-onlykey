@@ -14,11 +14,26 @@ trap handle_sig SIGHUP SIGINT SIGQUIT
   && exit 1
 
 
-notify-send --ready --status "Root socket ready"
+read -r remote_domain <&0
 
+get_daemon_service() {
+  systemctl show --user --property=Listen "onlykey-agent-daemon@${remote_domain}"
+}
 
+if [[ -z "$(get_daemon_service)" ]]; then
+  # systemctl --user start "onlykey-agent-daemon-factory@$(systemd-escape "${remote_domain}").socket"
+  echo "${remote_domain}" | nc -U "${XDG_RUNTIME_DIR}/onlykey-agent/daemon-factory.sock"
+fi
+
+for ((i = 0; i < 30; i++)); do
+  systemd-cat --identifier="onlykey-agent-socket" echo "Daemon still not ready, waiting 1 second"
+  sleep 1
+done
+
+SSH_AUTH_SOCK=$(get_daemon_service | grep -o "/run.*" | cut -d\  -f 1)
+export SSH_AUTH_SOCK
+
+systemd-notify --ready --status "Root socket ready"
 systemctl --user start "onlykey-agent-daemon-factory@$(systemd-escape "${QREXEC_REMOTE_DOMAIN}").socket"
 
-# TODO: wtf do i do here?
-socat fd:
-
+socat fd:3 "unix-connect:${SSH_AUTH_SOCK}"

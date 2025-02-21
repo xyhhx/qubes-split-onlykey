@@ -4,14 +4,12 @@ Description=onlykey-agent
 
 Requires=onlykey-agent.socket
 Requires=onlykey-agent-daemon-factory.socket
-StopWhenUnneeded=true
+After=onlykey-agent-daemon-factory.socket
 
 [Service]
 Type=notify
 Environment=OK_SSH_SOCK=%t/%p/S.ssh-agent
-ExecStart=systemd-socket-activate -a -l %t/%/%i.aux -E OK_SSH_SOCK /usr/local/bin/onlykey-agent-socket 
-ExecStartPost=-socat fd:3 unix-connect:%t/%p/%i.aux
-ExecStartPost=!ln -s /usr/local/bin/onlykey-agent-socket /usr/local/etc/qubes-rpc/onlykey.SshAgent
-RuntimeDirectory=split-onlykey/ssh-agent
+ExecStart=onlykey-agent-socket
+RuntimeDirectory=split-onlykey/%p
 
 # TODO: Sandboxing/hardening

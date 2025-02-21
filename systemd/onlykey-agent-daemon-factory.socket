@@ -5,7 +5,7 @@ Description=onlykey-agent daemon factory
 BindsTo=onlykey-agent.service
 
 [Socket]
-ListenStream=%t/%p/%i.sock
+ListenStream=%t/onlykey-agent/daemon-factory.sock
 PassFileDescriptorsToExec=true
 RemoveOnStop=true
 Accept=true

@@ -3,9 +3,9 @@
 Description=onlykey-agent socket
 
 [Socket]
-ListenStream=%t/%p/S.ssh-agent
+ListenStream=%t/split-onlykey/%p/S.ssh-agent
 PassFileDescriptorsToExec=true
-RemoveOnStop=true
+; RemoveOnStop=true
 
 [Install]
 WantedBy=sockets.target
