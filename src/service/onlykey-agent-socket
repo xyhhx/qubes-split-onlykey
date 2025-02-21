@@ -1,5 +1,10 @@
 #!/bin/bash
 set -aeo pipefail
+set -x
+
+log() {
+	systemd-cat --identifier="onlykey-agent-socket" echo "${@}"
+}
 
 handle_sig(){
   systemd-notify --status "Exiting" \
@@ -13,27 +18,16 @@ trap handle_sig SIGHUP SIGINT SIGQUIT
   && echo "No remote to work with" \
   && exit 1
 
-
-read -r remote_domain <&0
-
 get_daemon_service() {
-  systemctl show --user --property=Listen "onlykey-agent-daemon@${remote_domain}"
+  systemctl show --user --property=Listen "onlykey-agent-daemon@${QREXEC_REMOTE_DOMAIN}"
 }
 
-if [[ -z "$(get_daemon_service)" ]]; then
-  # systemctl --user start "onlykey-agent-daemon-factory@$(systemd-escape "${remote_domain}").socket"
-  echo "${remote_domain}" | nc -U "${XDG_RUNTIME_DIR}/onlykey-agent/daemon-factory.sock"
-fi
-
-for ((i = 0; i < 30; i++)); do
-  systemd-cat --identifier="onlykey-agent-socket" echo "Daemon still not ready, waiting 1 second"
-  sleep 1
-done
+echo -n "${QREXEC_REMOTE_DOMAIN}" | nc -U "${XDG_RUNTIME_DIR}/onlykey-agent/daemon-factory.sock"
 
 SSH_AUTH_SOCK=$(get_daemon_service | grep -o "/run.*" | cut -d\  -f 1)
 export SSH_AUTH_SOCK
 
-systemd-notify --ready --status "Root socket ready"
-systemctl --user start "onlykey-agent-daemon-factory@$(systemd-escape "${QREXEC_REMOTE_DOMAIN}").socket"
+notify-send --ready --status "Root socket ready"
+socat - "unix-connect:${SSH_AUTH_SOCK:-"${XDG_RUNTIME_DIR}/onlykey-agent/S.ssh-agent"},fork,unlink-early"
 
-socat fd:3 "unix-connect:${SSH_AUTH_SOCK}"
+

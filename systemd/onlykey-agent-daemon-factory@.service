@@ -4,5 +4,9 @@ Description=Onlykey SSH Agent daemon factory %i
 
 [Service]
 Environment=OK_CLIENT_DOMAIN=%i
-ExecStart=onlykey-agent-daemon-factory
-User=Root
+ExecStart=/usr/local/bin/onlykey-agent-daemon-factory
+StandardInput=socket
+StandardOutput=append:/tmp/factory.log
+
+User=root
+Group=root

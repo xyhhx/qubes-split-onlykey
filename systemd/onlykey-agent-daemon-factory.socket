@@ -2,13 +2,14 @@
 [Unit]
 Description=onlykey-agent daemon factory
 
-BindsTo=onlykey-agent.service
 
 [Socket]
 ListenStream=%t/onlykey-agent/daemon-factory.sock
 PassFileDescriptorsToExec=true
 RemoveOnStop=true
 Accept=true
+StandardOutput=append:/tmp/factory.log
+SocketUser=root
 
 [Install]
 WantedBy=sockets.target

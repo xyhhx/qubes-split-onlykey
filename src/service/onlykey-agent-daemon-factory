@@ -1,21 +1,35 @@
 #!/bin/bash
 set -aeo pipefail
+set -x
+identifier="${0}"
+
+env
+
+log() {
+  systemd-cat --identifier="${identifier}" echo "${@}"
+}
 
 handle_sig(){
   systemd-notify --status "Exiting" \
     && sleep 3 \
     && exit 0
-
 }
+
 
 trap handle_sig SIGHUP SIGINT SIGQUIT
 
-[[ -z "${OK_CLIENT_DOMAIN}" && -z "${LISTEN_FDS}" ]] \
-  && echo "No remote to work with" \
+[[ -z "${OK_CLIENT_DOMAIN}" ]] \
+  && echo "No client domain specified, exiting" \
   && exit 1
 
 
-# systemctl --user start "onlykey-agent-daemon@$(systemd-escape "${OK_CLIENT_DOMAIN}").socket"
 
-systemd-notify --status "Started a daemon for ${OK_CLIENT_DOMAIN}"
+busctl call \
+  org.freedesktop.systemd1 \
+  /org/freedesktop/systemd1 \
+  org.freedesktop.systemd1.Manager \
+  StartUnit \
+  ss \
+  "onlykey-agent-daemon-factory@${OK_CLIENT_DOMAIN}.service" \
+  replace
 

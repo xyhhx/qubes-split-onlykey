@@ -9,7 +9,7 @@ After=onlykey-agent-daemon-factory.socket
 [Service]
 Type=notify
 Environment=OK_SSH_SOCK=%t/%p/S.ssh-agent
-ExecStart=onlykey-agent-socket
+ExecStart=/usr/local/bin/onlykey-agent-socket
 RuntimeDirectory=split-onlykey/%p
 
 # TODO: Sandboxing/hardening
