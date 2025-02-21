@@ -3,10 +3,11 @@
 Description=Onlykey SSH Agent daemon factory %i
 
 [Service]
+Type=notify
 Environment=OK_CLIENT_DOMAIN=%i
-ExecStart=/usr/local/bin/onlykey-agent-daemon-factory
+ExecStart=@+/usr/local/bin/onlykey-agent-daemon-factory
 StandardInput=socket
-StandardOutput=append:/tmp/factory.log
+StandardOutput=socket
 
 User=root
 Group=root

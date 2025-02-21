@@ -1,7 +1,7 @@
 #!/bin/bash
 set -aeo pipefail
 set -x
-identifier="${0}"
+identifier="onlykey-agent-daemon-factory"
 
 env
 
@@ -18,7 +18,7 @@ handle_sig(){
 
 trap handle_sig SIGHUP SIGINT SIGQUIT
 
-[[ -z "${OK_CLIENT_DOMAIN}" ]] \
+[[ -z "${0}" ]] \
   && echo "No client domain specified, exiting" \
   && exit 1
 
@@ -30,6 +30,6 @@ busctl call \
   org.freedesktop.systemd1.Manager \
   StartUnit \
   ss \
-  "onlykey-agent-daemon-factory@${OK_CLIENT_DOMAIN}.service" \
+  "onlykey-agent-daemon-factory@${0}.service" \
   replace
 
