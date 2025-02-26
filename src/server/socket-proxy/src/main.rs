@@ -1,16 +1,46 @@
-use anyhow::Result;
-use std::env;
-use tokio::io::{copy, stdin, BufReader, BufWriter};
-use tokio::net::UnixStream;
-
-// simply proxies stdin to whatever socket is available on $SSH_AUTH_SOCK
+use anyhow::{bail, Error, Result};
+use core::str;
+use tokio::{
+  io::{copy, stdout, AsyncBufReadExt, BufReader, BufWriter},
+  net::{UnixListener, UnixStream},
+};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-  let ssh_auth_sock = env::var("SSH_AUTH_SOCK").expect("SSH_AUTH_SOCK must be defined");
-  let mut stream = UnixStream::connect(ssh_auth_sock).await?;
-  let mut reader = BufReader::new(stdin());
-  let mut writer = BufWriter::new(&mut stream);
+  let mut listenfd = listenfd::ListenFd::from_env();
+  let listener = UnixListener::from_std(
+    listenfd
+      .take_unix_listener(0)?
+      .expect("Couldn't create listener"),
+  )?;
+
+  while let Ok((mut sock, _)) = listener.accept().await {
+    tokio::spawn(async move {
+      handle_connection(&mut sock).await?;
+      Ok::<_, Error>(())
+    });
+  }
+
+  Ok(())
+}
+
+async fn handle_connection(socket: &mut UnixStream) -> Result<()> {
+  let mut initial_buf: Vec<u8> = vec![];
+  let mut writer = BufWriter::new(stdout());
+  let mut reader = BufReader::new(socket);
+  let n = reader.read_until(b'\0', &mut initial_buf).await?;
+
+  let [rpc_service, remote_domain] = str::from_utf8(&initial_buf[..n - 1])?
+    .split(" ")
+    .collect::<Vec<_>>()[..2]
+  else {
+    bail!("Couldn't read service descriptor header");
+  };
+
+  println!(
+    "qrexec call: rpc_service={:?} remote_domain={:?}",
+    &rpc_service, &remote_domain
+  );
 
   copy(&mut reader, &mut writer).await?;
 

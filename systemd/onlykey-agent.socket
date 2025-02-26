@@ -3,12 +3,9 @@
 Description=onlykey-agent socket
 
 [Socket]
-ListenStream=/run/split-onlykey/%p/S.ssh-agent
+ListenStream=/run/split-onlykey/%p/ssh-agent.sock
 
-ExecStartPost=-/bin/ln -s /run/split-onlykey/%p/S.ssh-agent /usr/local/etc/qubes-rpc/onlykey.SshAgent
-ExecStopPost=-/bin/rm /usr/local/etc/qubes-rpc/onlykey.SshAgent
-PassFileDescriptorsToExec=true
-RemoveOnStop=true
+Symlinks=/usr/local/etc/qubes-rpc/onlykey.SshAgent
 
 [Install]
 WantedBy=sockets.target

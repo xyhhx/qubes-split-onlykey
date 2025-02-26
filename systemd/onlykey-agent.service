@@ -10,7 +10,7 @@ After=onlykey-agent-daemon-factory.socket
 ; Type=notify
 Environment=DAEMON_FACTORY_SOCKET=/run/split-onlykey/onlykey-agent/daemon-factory.sock
 Environment=OK_SSH_SOCK=/run/split-onlykey/onlykey-agent/S.ssh-agent
-ExecStart=+/usr/local/bin/onlykey-agent-socket
+ExecStart=+/usr/local/bin/socket-proxy
 RuntimeDirectory=split-onlykey/onlykey-agent
 
 # TODO: Sandboxing/hardening
