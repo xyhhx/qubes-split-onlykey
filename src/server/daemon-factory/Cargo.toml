@@ -1,0 +1,19 @@
+[package]
+name = "daemon-factory"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.96"
+futures = "0.3.31"
+futures-util = { version = "0.3.31", features = ["futures-io", "tokio-io"] }
+log = { version = "0.4.26", features = [
+  "max_level_trace",
+  "serde",
+  "value-bag",
+] }
+socket2 = "0.5.8"
+systemd-journal-logger = "2.2.0"
+tokio = { version = "1.43.0", features = ["full", "mio", "socket2", "tracing"] }
+zbus = { version = "5", default-features = false, features = ["tokio"] }
+zbus_macros = "5.5.0"

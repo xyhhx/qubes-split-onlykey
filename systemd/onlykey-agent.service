@@ -7,9 +7,10 @@ Requires=onlykey-agent-daemon-factory.socket
 After=onlykey-agent-daemon-factory.socket
 
 [Service]
-Type=notify
-Environment=OK_SSH_SOCK=%t/%p/S.ssh-agent
-ExecStart=/usr/local/bin/onlykey-agent-socket
-RuntimeDirectory=split-onlykey/%p
+; Type=notify
+Environment=DAEMON_FACTORY_SOCKET=/run/split-onlykey/onlykey-agent/daemon-factory.sock
+Environment=OK_SSH_SOCK=/run/split-onlykey/onlykey-agent/S.ssh-agent
+ExecStart=+/usr/local/bin/onlykey-agent-socket
+RuntimeDirectory=split-onlykey/onlykey-agent
 
 # TODO: Sandboxing/hardening
