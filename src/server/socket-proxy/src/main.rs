@@ -1,9 +1,8 @@
-use anyhow::{bail, Error, Result};
 use core::str;
-use tokio::{
-  io::{copy, stdout, AsyncBufReadExt, BufReader, BufWriter},
-  net::{UnixListener, UnixStream},
-};
+
+use anyhow::{bail, Error, Result};
+use tokio::io::{copy, stdout, AsyncBufReadExt, BufReader, BufWriter};
+use tokio::net::{UnixListener, UnixStream};
 
 #[tokio::main]
 async fn main() -> Result<()> {

@@ -2,8 +2,8 @@ use std::env;
 
 use anyhow::Result;
 use tokio::io::{stdin, AsyncReadExt};
-
-use zbus::{proxy, zvariant::OwnedObjectPath, Connection};
+use zbus::zvariant::OwnedObjectPath;
+use zbus::{proxy, Connection};
 
 #[tokio::main]
 async fn main() -> Result<()> {

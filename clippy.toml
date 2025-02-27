@@ -1,0 +1,10 @@
+# default is 7, 8's ok. https://rust-lang.github.io/rust-clippy/master/index.html#too_many_arguments
+too-many-arguments-threshold = 8
+
+# default's 250
+type-complexity-threshold = 300
+
+allow-expect-in-tests = true
+allow-unwrap-in-tests = true
+allow-panic-in-tests = true
+allow-dbg-in-tests = true

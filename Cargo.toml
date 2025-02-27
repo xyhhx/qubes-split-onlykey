@@ -1,6 +1,21 @@
 [workspace.package]
 authors = ["xyhhx <xyhhx@tuta.io>"]
-rust-version = "1.84"
+rust-version = "1.87"
+license = "HL3-FULL"
+license-file = "./LICENSE.md"
+readme = "./README.md"
+description = "qubes split rpc configuration for proxying onlykey tooling between qubes domains"
+keywords = [
+  "qubes",
+  "qubes-os",
+  "onlykey",
+  "ssh",
+  "gpg",
+  "security",
+  "systemd",
+  "sandboxing",
+  "socket-activation",
+]
 
 [workspace]
 resolver = "2"
