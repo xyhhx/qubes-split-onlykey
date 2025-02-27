@@ -1,0 +1,11 @@
+[workspace.package]
+authors = ["xyhhx <xyhhx@tuta.io>"]
+rust-version = "1.84"
+
+[workspace]
+resolver = "2"
+members = ["src/server/socket-proxy", "src/server/daemon-factory"]
+
+[workspace.dependencies]
+socket_proxy = { path = "./src/server/socket-proxy" }
+daemon_factory = { path = "./src/server/daemon-factory" }
