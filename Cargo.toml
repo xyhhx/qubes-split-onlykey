@@ -3,7 +3,7 @@ version = "0.1.0-dev"
 edition = "2024"
 
 authors = ["xyhhx <xyhhx@tuta.io>"]
-rust-version = "1.85"
+rust-version = "1.87"
 license-file = "./LICENSE.md"
 readme = "./README.md"
 description = "qubes split rpc configuration for proxying onlykey tooling between qubes domains"

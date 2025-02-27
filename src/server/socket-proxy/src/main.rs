@@ -6,9 +6,9 @@ use std::env;
 use std::os::unix::net::{SocketAddr, UnixStream as StdStream};
 use std::path::Path;
 
-use anyhow::{bail, Error, Result};
+use anyhow::{Error, Result, bail};
 use server_lib::Systemd1ManagerProxy;
-use tokio::io::{copy, stdout, AsyncBufReadExt, BufReader, BufWriter};
+use tokio::io::{AsyncBufReadExt, BufReader, BufWriter, copy, stdout};
 use tokio::net::{UnixListener, UnixStream};
 use zbus::Connection;
 
