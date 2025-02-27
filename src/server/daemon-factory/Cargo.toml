@@ -1,20 +1,22 @@
 [package]
 name = "daemon-factory"
-version = "0.1.0"
-edition = "2021"
+version = { workspace = true }
+authors = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+license-file = { workspace = true }
+
+[[bin]]
+name = "agent-daemon-factory"
+path = "./src/main.rs"
 
 [dependencies]
-anyhow = "1.0.96"
-futures = "0.3.31"
-futures-util = { version = "0.3.31", features = ["futures-io", "tokio-io"] }
-log = { version = "0.4.26", features = [
-  "max_level_trace",
-  "serde",
-  "value-bag",
-] }
-socket2 = "0.5.8"
-systemd-journal-logger = "2.2.0"
-tokio = { version = "1.43.0", features = ["full", "mio", "socket2", "tracing"] }
-zbus = { version = "5", default-features = false, features = ["tokio"] }
-zbus_macros = "5.5.0"
-zvariant_derive = "5.4.0"
+anyhow = { workspace = true }
+futures = { workspace = true }
+systemd-journal-logger = { workspace = true }
+
+futures-util = { workspace = true }
+log = { workspace = true }
+server_lib = { workspace = true }
+tokio = { workspace = true }
+zbus = { workspace = true }

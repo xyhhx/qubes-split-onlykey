@@ -1,0 +1,15 @@
+[package]
+name = "server_lib"
+version = { workspace = true }
+authors = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+license-file = { workspace = true }
+
+[lib]
+name = "server_lib"
+path = "./src/lib.rs"
+
+
+[dependencies]
+zbus = { workspace = true }

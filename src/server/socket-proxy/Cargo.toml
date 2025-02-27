@@ -1,12 +1,22 @@
 [package]
 name = "socket-proxy"
-version = "0.1.0"
-edition = "2021"
+
+version = { workspace = true }
+authors = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+license-file = { workspace = true }
+
+[[bin]]
+name = "agent-socket-proxy"
+path = "./src/main.rs"
 
 [dependencies]
-anyhow = "1.0.96"
-listenfd = "1.0.2"
-log = { version = "0.4.25", features = ["std"] }
-tokio = { version = "1.43.0", features = ["full", "net"] }
-tokio-stream = { version = "0.1.17", features = ["net"] }
-zbus = { version = "5.5.0", features = ["tokio"] }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+listenfd = { workspace = true }
+zbus = { workspace = true, features = ["tokio"] }
+server_lib = { workspace = true }
+
+[dev-dependencies]
+server_lib = { workspace = true }

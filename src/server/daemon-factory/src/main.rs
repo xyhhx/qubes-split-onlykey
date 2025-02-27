@@ -1,9 +1,11 @@
 use std::env;
-
+extern crate anyhow;
+extern crate tokio;
+extern crate zbus;
 use anyhow::Result;
-use tokio::io::{stdin, AsyncReadExt};
-use zbus::zvariant::OwnedObjectPath;
-use zbus::{proxy, Connection};
+use server_lib::Systemd1ManagerProxy;
+use tokio::io::{AsyncReadExt, stdin};
+use zbus::Connection;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -29,13 +31,4 @@ async fn main() -> Result<()> {
   println!("started the daemon at job path {:?}", path);
 
   Ok(())
-}
-
-#[proxy(
-  interface = "org.freedesktop.systemd1.Manager",
-  default_service = "org.freedesktop.systemd1",
-  default_path = "/org/freedesktop/systemd1"
-)]
-trait Systemd1Manager {
-  fn start_unit(&self, name: &str, mode: &str) -> zbus::Result<OwnedObjectPath>;
 }

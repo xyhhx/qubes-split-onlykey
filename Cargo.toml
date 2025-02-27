@@ -1,7 +1,9 @@
 [workspace.package]
+version = "0.1.0-dev"
+edition = "2024"
+
 authors = ["xyhhx <xyhhx@tuta.io>"]
-rust-version = "1.87"
-license = "HL3-FULL"
+rust-version = "1.85"
 license-file = "./LICENSE.md"
 readme = "./README.md"
 description = "qubes split rpc configuration for proxying onlykey tooling between qubes domains"
@@ -19,8 +21,24 @@ keywords = [
 
 [workspace]
 resolver = "2"
-members = ["src/server/socket-proxy", "src/server/daemon-factory"]
+members = [
+  "src/server/socket-proxy",
+  "src/server/daemon-factory",
+  "src/server/lib",
+]
 
 [workspace.dependencies]
-socket_proxy = { path = "./src/server/socket-proxy" }
-daemon_factory = { path = "./src/server/daemon-factory" }
+socket_proxy = { path = "./src/server/socket-proxy", version = "0.1.0-dev" }
+daemon_factory = { path = "./src/server/daemon-factory", version = "0.1.0-dev" }
+server_lib = { path = "./src/server/lib", version = "0.1.0-dev" }
+
+sd-notify = "0.4.5"
+anyhow = "1.0.96"
+futures = "0.3.31"
+futures-util = { version = "0.3.31", features = ["futures-io", "tokio-io"] }
+listenfd = "1.0.2"
+systemd-journal-logger = "2.2.0"
+log = { version = "0.4.25", features = ["std"] }
+tokio = { version = "1.43.0", features = ["full", "net"] }
+tokio-stream = { version = "0.1.17", features = ["net"] }
+zbus = { version = "5.5.0", features = ["tokio"] }

@@ -1,10 +1,9 @@
 # vim: set syn=systemd :
 [Unit]
-Description=onlykey-agent socket
+Description=Qubes Split Onlykey onlykey-agent root socket
 
 [Socket]
 ListenStream=/run/split-onlykey/%p/ssh-agent.sock
-
 Symlinks=/usr/local/etc/qubes-rpc/onlykey.SshAgent
 
 [Install]

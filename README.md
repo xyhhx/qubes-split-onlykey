@@ -10,4 +10,5 @@
 Qubes split configuration for Onlykey security keys. Design inspiration mostly coming from:
 
 - https://piware.de/post/2019-10-15-cockpit-systemd-activation-cubed/
+- https://github.com/cockpit-project/cockpit/blob/main/src/tls/README.md
 - https://gist.github.com/bcduggan/bb60d79d2d1a2c2045d3a5dd4d35ca4d
