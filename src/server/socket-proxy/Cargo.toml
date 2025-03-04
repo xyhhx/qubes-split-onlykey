@@ -8,7 +8,7 @@ edition = { workspace = true }
 license-file = { workspace = true }
 
 [[bin]]
-name = "agent-socket-proxy"
+name = "onlykey-agent-socket-proxy"
 path = "./src/main.rs"
 
 [dependencies]

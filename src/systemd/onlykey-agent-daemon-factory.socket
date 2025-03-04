@@ -4,7 +4,7 @@ Description=onlykey-agent daemon factory
 
 
 [Socket]
-ListenStream=%t/onlykey-agent/daemon-factory.sock
+ListenStream=%t/split-onlykey/onlykey-agent/daemon-factory.sock
 PassFileDescriptorsToExec=true
 RemoveOnStop=true
 Accept=true

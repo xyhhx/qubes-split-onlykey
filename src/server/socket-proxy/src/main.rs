@@ -74,7 +74,9 @@ async fn parse_qrexec_input(reader: &mut BufReader<&mut UnixStream>) -> Result<(
 
 async fn get_factory_socket_addr() -> Result<SocketAddr> {
   let runtime_path = env::var("RUNTIME_DIRECTORY")?;
-  let path = Path::new(&runtime_path).with_file_name("daemon-factory.sock");
+  let path = Path::new(&runtime_path)
+    .join("split-onlykey/onlykey-agent")
+    .with_file_name("daemon-factory.sock");
   let sock_addr = SocketAddr::from_pathname(path)?;
 
   Ok(sock_addr)

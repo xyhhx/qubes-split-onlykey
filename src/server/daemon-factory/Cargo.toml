@@ -7,7 +7,7 @@ edition = { workspace = true }
 license-file = { workspace = true }
 
 [[bin]]
-name = "agent-daemon-factory"
+name = "onlykey-agent-daemon-factory"
 path = "./src/main.rs"
 
 [dependencies]
