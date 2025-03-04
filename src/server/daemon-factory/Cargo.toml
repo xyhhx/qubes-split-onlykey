@@ -20,3 +20,4 @@ log = { workspace = true }
 server_lib = { workspace = true }
 tokio = { workspace = true }
 zbus = { workspace = true }
+sd-notify = { workspace = true }

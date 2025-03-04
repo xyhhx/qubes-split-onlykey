@@ -13,10 +13,11 @@ path = "./src/main.rs"
 
 [dependencies]
 anyhow = { workspace = true }
-tokio = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
 listenfd = { workspace = true }
 zbus = { workspace = true, features = ["tokio"] }
 server_lib = { workspace = true }
+sd-notify = { workspace = true }
 
 [dev-dependencies]
 server_lib = { workspace = true }
