@@ -10,10 +10,8 @@ use std::path::Path;
 
 use anyhow::{Error, Result, bail};
 use sd_notify::NotifyState;
-use server_lib::Systemd1ManagerProxy;
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader, BufWriter, Interest, copy, stdout};
+use tokio::io::{AsyncBufReadExt, BufReader, BufWriter, copy_bidirectional};
 use tokio::net::{UnixListener, UnixStream};
-use zbus::{Connection, MatchRule};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -38,33 +36,27 @@ async fn main() -> Result<()> {
 }
 
 async fn handle_connection(incoming_rpc_socket: &mut UnixStream) -> Result<()> {
-  let mut writer = BufWriter::new(stdout());
-  let rpc_call = get_rpc_info_from_socket_input(incoming_rpc_socket).await?;
-  // TODO: validate input
+  let mut reader = BufReader::new(incoming_rpc_socket);
+  let (remote_domain, _) = parse_qrexec_input(&mut reader).await?;
+  handle_factory(remote_domain.as_str()).await?;
 
-  // TODO: Spawn a new daemon, get its socket
-  let connection = Connection::session().await?;
-  let systemd_proxy = Systemd1ManagerProxy::new(&connection).await?;
-  handle_factory(rpc_call.remote_domain.as_str());
-
-  // start a daemon factory: pass the remote domain name to the factory.socket
-  // wait for it to finish, then find the spawned daemon socket/service
-  // connect to that socket, forwarding to the input socket here
-
-  // TODO: Proxy to that socket instead
+  let daemon_sock = UnixStream::connect(format!(
+    "{}/split-onlykey/onlykey-agent/{}/S.ssh-agent",
+    env::var("RUNTIME_DIRECTORY")?,
+    remote_domain
+  ))
+  .await?;
+  let mut writer = BufWriter::new(daemon_sock);
 
   // Connect reader/writer socket buffers
-  copy(&mut reader, &mut writer).await?;
+  copy_bidirectional(&mut reader, &mut writer).await?;
 
   Ok(())
 }
 
-async fn get_rpc_info_from_socket_input(
-  incoming_rpc_socket: &mut UnixStream,
-) -> Result<QubesRPCCall> {
+async fn parse_qrexec_input(reader: &mut BufReader<&mut UnixStream>) -> Result<(String, String)> {
   // Set up buffers
   let mut buffer: Vec<u8> = vec![];
-  let mut reader = BufReader::new(incoming_rpc_socket);
 
   // Read the until header delimiter
   let n = reader.read_until(b'\0', &mut buffer).await?;
@@ -77,10 +69,7 @@ async fn get_rpc_info_from_socket_input(
     bail!("Couldn't read socket input into buffer")
   };
 
-  Ok(QubesRPCCall {
-    remote_domain: String::from(remote_domain),
-    rpc_service: String::from(rpc_service),
-  })
+  Ok((String::from(remote_domain), String::from(rpc_service)))
 }
 
 async fn get_factory_socket_addr() -> Result<SocketAddr> {
@@ -91,28 +80,46 @@ async fn get_factory_socket_addr() -> Result<SocketAddr> {
   Ok(sock_addr)
 }
 
-async fn make_match_rule() -> Result<MatchRule<'static>> {
-  Ok(
-    MatchRule::builder()
-      .msg_type(zbus::message::Type::Signal)
-      .sender("org.freedesktop.systemd1")?
-      .interface("org.freedesktop.systemd1.Manager")?
-      .member("JobRemoved")?
-      .build(),
-  )
-}
-
-async fn handle_factory(remote_domain: &str) -> Result<&str> {
+async fn handle_factory(remote_domain: &str) -> Result<String> {
   let socket_addr = get_factory_socket_addr().await?;
   let std_stream = StdStream::connect_addr(&socket_addr)?;
   let stream = UnixStream::from_std(std_stream)?;
+  let mut msg = vec![0u8; 1024];
 
-  // TODO: write the remote_domain to the socket
-  // TODO: wait for output from socket, read value (the job path of the new daemon service)
-  // TODO: return the job path
-}
+  loop {
+    stream.writable().await?;
+    match stream.try_write(remote_domain.as_bytes()) {
+      Ok(_) => {
+        break;
+      }
 
-struct QubesRPCCall {
-  remote_domain: String,
-  rpc_service: String,
+      Err(ref e) if e.kind() == ErrorKind::WouldBlock => {
+        continue;
+      }
+
+      Err(e) => {
+        return Err(e.into());
+      }
+    }
+  }
+
+  loop {
+    stream.readable().await?;
+    match stream.try_read(&mut msg) {
+      Ok(n) => {
+        msg.truncate(n);
+        break;
+      }
+
+      Err(ref e) if e.kind() == ErrorKind::WouldBlock => {
+        continue;
+      }
+
+      Err(e) => {
+        return Err(e.into());
+      }
+    }
+  }
+
+  Ok(String::from_utf8(msg)?)
 }
