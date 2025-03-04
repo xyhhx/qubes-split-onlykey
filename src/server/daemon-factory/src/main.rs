@@ -1,12 +1,15 @@
 use std::env;
+
 extern crate anyhow;
 extern crate sd_notify;
 extern crate tokio;
 extern crate zbus;
+
 use anyhow::Result;
+use log::debug;
 use sd_notify::NotifyState;
 use server_lib::Systemd1ManagerProxy;
-use tokio::io::{AsyncReadExt, stdin};
+use tokio::io::{AsyncReadExt, AsyncWriteExt, stdin, stdout};
 use zbus::Connection;
 
 #[tokio::main]
@@ -14,6 +17,7 @@ async fn main() -> Result<()> {
   let connection = Connection::session().await?;
   dbg!(&connection);
   dbg!(env::vars());
+
   // notify systemd and we're ready to start
   sd_notify::notify(false, &[NotifyState::Ready])?;
 
@@ -21,7 +25,7 @@ async fn main() -> Result<()> {
   let mut input = String::new();
   stdin().read_to_string(&mut input).await?;
   dbg!(&input);
-  // sanitization
+
   let unit = format!(
     // TODO: This should be configurable
     "daemon@{}.socket",
@@ -32,10 +36,14 @@ async fn main() -> Result<()> {
   let systemd_proxy = Systemd1ManagerProxy::new(&connection).await?;
   let name = &unit;
   let mode = "replace";
-  println!("calling start_unit with args:");
+  debug!("Calling start_unit with args: name={} mode={}", name, mode);
   dbg!((name, mode));
+
   let path = systemd_proxy.start_unit(name, mode).await?;
-  println!("started the daemon at job path {:?}", path);
+  debug!("started the daemon at job path {:?}", path);
+
+  // write path to stdout
+  stdout().write_all(path.as_bytes()).await?;
 
   // we're done
   sd_notify::notify(false, &[NotifyState::Stopping])?;
