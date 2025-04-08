@@ -39,6 +39,6 @@ futures-util = { version = "0.3.31", features = ["futures-io", "tokio-io"] }
 listenfd = "1.0.2"
 systemd-journal-logger = "2.2.0"
 log = { version = "0.4.25", features = ["std"] }
-tokio = { version = "1.43.0", features = ["full", "net"] }
+tokio = { version = "1.44.2", features = ["full", "net"] }
 tokio-stream = { version = "0.1.17", features = ["net"] }
 zbus = { version = "5.5.0", features = ["tokio", "p2p"] }
